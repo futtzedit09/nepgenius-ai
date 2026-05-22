@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NepGenius AI — Class 12 Nepal Smart Study Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#FFD166;--gold2:#F4A261;
+  --cyan:#00F5D4;--cyan2:#00C4B3;
+  --blue:#4FC3F7;--purple:#B39DDB;
+  --red:#FF6B6B;
+  --bg:#04070F;--bg2:#080D1A;
+  --card:#0B1120;--card2:#101825;--card3:#141D2E;
+  --border:rgba(255,255,255,0.06);--border2:rgba(0,245,212,0.15);
+  --text:#EDF2F7;--muted:#64748B;--muted2:#94A3B8;
+  --accent:var(--cyan);
+  --shadow-glow:0 0 80px rgba(0,245,212,0.08);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Space Grotesk',sans-serif;font-size:16px;
+  min-height:100vh;overflow-x:hidden;
+}
+
+/* ─── 3D CANVAS ─── */
+#three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.7}
+
+/* ─── NOISE GRAIN ─── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;opacity:.5;
+}
+
+/* ─── GRADIENT MESH ─── */
+.mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.mesh-blob{position:absolute;border-radius:50%;filter:blur(120px);animation:blobDrift 18s ease-in-out infinite}
+.mb1{width:700px;height:700px;background:radial-gradient(circle,rgba(0,245,212,.07),transparent 65%);top:-200px;right:-200px;animation-delay:0s}
+.mb2{width:600px;height:600px;background:radial-gradient(circle,rgba(79,195,247,.06),transparent 65%);bottom:-150px;left:-150px;animation-delay:-6s}
+.mb3{width:400px;height:400px;background:radial-gradient(circle,rgba(179,157,219,.05),transparent 65%);top:40%;left:35%;animation-delay:-12s}
+.mb4{width:300px;height:300px;background:radial-gradient(circle,rgba(255,209,102,.04),transparent 65%);bottom:20%;right:10%;animation-delay:-9s}
+@keyframes blobDrift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.06)}66%{transform:translate(-25px,20px) scale(0.95)}}
+
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:68px;padding:0 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(4,7,15,.8);backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;font-weight:900;font-size:1.35rem;
+  background:linear-gradient(135deg,var(--cyan) 0%,var(--blue) 60%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-.5px;display:flex;align-items:center;gap:.5rem;
+}
+.nav-logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite;flex-shrink:0}
+.nav-links{display:flex;gap:1.8rem;list-style:none}
+.nav-links a{color:var(--muted2);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;letter-spacing:.02em}
+.nav-links a:hover{color:var(--cyan)}
+.nav-right{display:flex;gap:.7rem;align-items:center}
+.btn-nav-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  border:none;border-radius:10px;padding:.45rem 1.1rem;
+  color:#04070F;font-weight:700;font-size:.83rem;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;transition:opacity .2s,transform .1s;
+}
+.btn-nav-primary:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ─── HERO ─── */
+.hero{
+  position:relative;z-index:10;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:7rem 2rem 3rem;text-align:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.6rem;
+  border:1px solid rgba(0,245,212,.3);background:rgba(0,245,212,.06);
+  padding:.38rem 1.1rem;border-radius:100px;
+  font-size:.78rem;font-weight:600;color:var(--cyan);letter-spacing:.04em;
+  text-transform:uppercase;margin-bottom:2.2rem;
+  animation:fadeUp .8s ease both;
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.6rem,6.5vw,5.5rem);
+  font-weight:900;line-height:1.04;letter-spacing:-2px;
+  animation:fadeUp .85s .08s ease both;
+}
+.grad-text{
+  background:linear-gradient(135deg,#fff 0%,var(--cyan) 45%,var(--blue) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  margin-top:1.6rem;font-size:1.08rem;color:var(--muted2);
+  max-width:560px;line-height:1.75;animation:fadeUp .85s .16s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── SEARCH MEGA ─── */
+.search-mega{
+  margin-top:2.8rem;width:100%;max-width:780px;
+  animation:fadeUp .85s .24s ease both;
+}
+.search-box{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:22px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,245,212,.05),0 30px 80px rgba(0,0,0,.6);
+  transition:border-color .3s,box-shadow .4s;
+}
+.search-box:focus-within{
+  border-color:rgba(0,245,212,.4);
+  box-shadow:0 0 0 1px rgba(0,245,212,.12),0 0 60px rgba(0,245,212,.12),0 30px 80px rgba(0,0,0,.6);
+}
+.search-top{display:flex;align-items:center;padding:1.1rem 1.3rem;gap:.85rem}
+.search-icon-wrap{color:var(--cyan);flex-shrink:0;opacity:.85}
+#main-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-size:1rem;font-family:'Space Grotesk',sans-serif;
+  font-weight:400;caret-color:var(--cyan);
+}
+#main-input::placeholder{color:var(--muted)}
+.search-bottom{
+  border-top:1px solid var(--border);
+  padding:.8rem 1.3rem;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;
+}
+.subject-chips{display:flex;gap:.4rem;flex-wrap:wrap}
+.chip{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  padding:.28rem .75rem;border-radius:100px;font-size:.76rem;
+  cursor:pointer;transition:all .2s;color:var(--muted2);font-family:'Space Grotesk',sans-serif;
+  font-weight:500;
+}
+.chip:hover,.chip.active{background:rgba(0,245,212,.1);border-color:rgba(0,245,212,.35);color:var(--cyan)}
+.search-actions{display:flex;gap:.5rem;align-items:center}
+.voice-btn{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;color:var(--muted2);flex-shrink:0;
+}
+.voice-btn:hover{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.3);color:var(--red)}
+.voice-btn.listening{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.5);color:var(--red);animation:voicePulse 1s infinite}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.4)}50%{box-shadow:0 0 0 8px rgba(255,107,107,0)}}
+.btn-ask{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  border:none;border-radius:11px;padding:.5rem 1.3rem;
+  color:#04070F;font-weight:700;font-size:.84rem;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;transition:opacity .2s,transform .1s;
+  display:flex;align-items:center;gap:.4rem;
+}
+.btn-ask:hover{opacity:.88}
+.btn-ask:active{transform:scale(.97)}
+.btn-notes{
+  background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.22);
+  border-radius:11px;padding:.5rem 1.2rem;
+  color:var(--gold);font-weight:600;font-size:.84rem;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;transition:all .2s;
+  display:flex;align-items:center;gap:.4rem;
+}
+.btn-notes:hover{background:rgba(255,209,102,.15);border-color:rgba(255,209,102,.4)}
+
+/* ─── QUICK PROMPTS ─── */
+.quick-prompts{
+  margin-top:1.2rem;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;
+}
+.qprompt{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:8px;padding:.3rem .75rem;font-size:.76rem;color:var(--muted2);
+  cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif;
+}
+.qprompt:hover{border-color:rgba(0,245,212,.25);color:var(--cyan);background:rgba(0,245,212,.05)}
+
+/* ─── ANSWER PANEL ─── */
+#answer-panel{
+  position:relative;z-index:10;
+  width:100%;max-width:920px;margin:0 auto;
+  padding:0 2rem 3rem;display:none;
+}
+.answer-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:22px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.answer-header{
+  padding:1rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.01);
+}
+.answer-label{
+  display:flex;align-items:center;gap:.5rem;
+  font-size:.78rem;font-weight:700;color:var(--cyan);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.answer-label-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pulse 1.5s infinite}
+.close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.4rem;line-height:1;transition:color .2s;padding:.2rem}
+.close-btn:hover{color:var(--text)}
+.answer-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
+.atab{
+  padding:.8rem 1.5rem;font-size:.84rem;cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;color:var(--muted2);
+  transition:all .2s;font-family:'Space Grotesk',sans-serif;font-weight:500;flex-shrink:0;
+}
+.atab:hover{color:var(--text)}
+.atab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.atab-content{display:none}
+.atab-content.active{display:block}
+#answer-body{padding:1.6rem;min-height:100px;font-size:.94rem;line-height:1.85;color:var(--text)}
+
+/* ─── LOADING ─── */
+.loading-dots{display:flex;gap:.4rem;padding:.5rem 0}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--cyan);animation:bounce .8s infinite}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:scale(1);opacity:.5}40%{transform:scale(1.35);opacity:1}}
+
+/* ─── WEB RESULTS ─── */
+.web-results-wrap{padding:1.5rem;display:grid;gap:.8rem}
+.web-item{
+  background:rgba(255,255,255,.025);border:1px solid var(--border);
+  border-radius:14px;padding:1rem 1.2rem;cursor:pointer;transition:all .2s;
+  text-decoration:none;color:inherit;display:block;
+}
+.web-item:hover{border-color:rgba(0,245,212,.25);background:rgba(0,245,212,.03);transform:translateY(-1px)}
+.web-src{font-size:.72rem;color:var(--muted2);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem}
+.web-src-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0}
+.web-title{font-weight:600;font-size:.93rem;color:var(--blue);margin-bottom:.35rem}
+.web-snippet{font-size:.84rem;color:var(--muted2);line-height:1.65}
+
+/* ─── IMAGE RESULTS ─── */
+.img-results-wrap{padding:1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem}
+.img-thumb{
+  border-radius:12px;overflow:hidden;border:1px solid var(--border);
+  cursor:pointer;transition:all .3s;position:relative;aspect-ratio:4/3;background:var(--card2);
+}
+.img-thumb:hover{border-color:rgba(0,245,212,.3);transform:scale(1.03)}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb-label{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));
+  padding:.5rem .6rem .4rem;font-size:.7rem;color:#fff;
+}
+
+/* ─── NOTES GRID ─── */
+.notes-results-wrap{padding:1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.8rem}
+.note-mini{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;padding:1.1rem;cursor:pointer;transition:all .3s;
+  display:flex;flex-direction:column;gap:.4rem;
+}
+.note-mini:hover{border-color:rgba(255,209,102,.35);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.note-mini-icon{font-size:1.7rem}
+.note-mini-title{font-weight:600;font-size:.88rem;color:var(--text)}
+.note-mini-meta{font-size:.75rem;color:var(--muted2)}
+.note-mini-badge{
+  display:inline-block;font-size:.68rem;padding:.18rem .55rem;border-radius:100px;
+  background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2);
+  font-weight:600;margin-top:.2rem;
+}
+
+/* ─── SECTION ─── */
+.section{position:relative;z-index:10;padding:5rem 2rem}
+.section-inner{max-width:1120px;margin:0 auto}
+.section-label{
+  font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--cyan);font-weight:700;margin-bottom:.8rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.section-label::before{content:'';width:20px;height:2px;background:var(--cyan);border-radius:1px;display:inline-block}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.9rem,4vw,3.2rem);
+  font-weight:900;letter-spacing:-1px;margin-bottom:1rem;line-height:1.1;
+}
+.section-sub{color:var(--muted2);font-size:1rem;max-width:500px;line-height:1.75}
+
+/* ─── STATS ─── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-top:3rem}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.6rem;text-align:center;transition:border-color .3s,transform .3s;
+}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.stat-num{
+  font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;
+}
+.stat-label{font-size:.82rem;color:var(--muted2);margin-top:.4rem;font-weight:500}
+
+/* ─── SUBJECTS GRID ─── */
+.subjects-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:1rem;margin-top:3rem;
+}
+.subj-card{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:1.6rem 1rem;text-align:center;cursor:pointer;transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.subj-card::before{
+  content:'';position:absolute;inset:0;border-radius:18px;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  opacity:0;transition:opacity .3s;
+}
+.subj-card:hover::before{opacity:.07}
+.subj-card:hover{border-color:rgba(0,245,212,.35);transform:translateY(-5px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.subj-card>*{position:relative;z-index:1}
+.subj-emoji{font-size:2.1rem;margin-bottom:.7rem;display:block}
+.subj-name{font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;color:var(--text)}
+.subj-count{font-size:.75rem;color:var(--muted2);margin-top:.3rem}
+.subj-bar{margin-top:.8rem;height:3px;background:rgba(255,255,255,.07);border-radius:100px;overflow:hidden}
+.subj-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width 1.2s ease}
+
+/* ─── QUICK Q&A ─── */
+.qa-grid{display:grid;gap:.75rem;margin-top:3rem}
+.qa-item{
+  background:var(--card);border:1px solid var(--border);border-radius:15px;
+  overflow:hidden;transition:border-color .2s;cursor:pointer;
+}
+.qa-item:hover{border-color:rgba(0,245,212,.2)}
+.qa-q{
+  padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  font-weight:500;font-size:.93rem;
+}
+.qa-icon{color:var(--cyan);flex-shrink:0;transition:transform .3s}
+.qa-item.open .qa-icon{transform:rotate(45deg)}
+.qa-a{
+  max-height:0;overflow:hidden;transition:max-height .45s ease,padding .3s;
+  padding:0 1.5rem;color:var(--muted2);font-size:.88rem;line-height:1.85;
+  border-top:0px solid var(--border);
+}
+.qa-item.open .qa-a{max-height:600px;padding:1.2rem 1.5rem;border-top-width:1px}
+.qa-subj{font-size:.7rem;padding:.2rem .6rem;border-radius:100px;font-weight:700;background:rgba(0,245,212,.08);color:var(--cyan);flex-shrink:0}
+
+/* ─── NOTES SECTION ─── */
+.notes-big-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:1.2rem;margin-top:3rem;
+}
+.nbc{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:1.6rem;transition:all .3s;cursor:pointer;position:relative;overflow:hidden;
+}
+.nbc::after{
+  content:'';position:absolute;bottom:-50px;right:-50px;
+  width:130px;height:130px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,245,212,.07),transparent);
+  pointer-events:none;transition:transform .3s;
+}
+.nbc:hover::after{transform:scale(1.6)}
+.nbc:hover{border-color:rgba(0,245,212,.28);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.nbc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.nbc-emoji{font-size:2.3rem}
+.nbc-tag{font-size:.7rem;padding:.22rem .65rem;border-radius:100px;font-weight:700;background:rgba(79,195,247,.1);color:var(--blue);border:1px solid rgba(79,195,247,.2)}
+.nbc-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:.45rem}
+.nbc-desc{font-size:.83rem;color:var(--muted2);line-height:1.65;margin-bottom:1rem}
+.nbc-footer{display:flex;align-items:center;justify-content:space-between}
+.nbc-pages{font-size:.76rem;color:var(--muted2)}
+.btn-view{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  border:none;border-radius:9px;padding:.38rem .85rem;
+  font-size:.78rem;font-weight:700;color:#04070F;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;transition:opacity .2s;
+}
+.btn-view:hover{opacity:.85}
+
+/* ─── PAST PAPERS ─── */
+.yqp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1rem;margin-top:3rem}
+.yqp-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.3rem;cursor:pointer;transition:all .3s;
+}
+.yqp-card:hover{border-color:rgba(255,209,102,.4);transform:translateY(-4px);box-shadow:0 16px 50px rgba(0,0,0,.5)}
+.yqp-year{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;color:var(--gold)}
+.yqp-lbl{font-size:.78rem;color:var(--muted2);margin-bottom:.5rem}
+.yqp-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.8rem}
+.yqp-tag{font-size:.68rem;padding:.18rem .48rem;border-radius:6px;background:rgba(255,255,255,.04);color:var(--muted2);border:1px solid var(--border)}
+
+/* ─── TESTIMONIALS ─── */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1rem;margin-top:3rem}
+.testi-card{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.6rem;
+  transition:all .3s;
+}
+.testi-card:hover{border-color:rgba(0,245,212,.2);transform:translateY(-2px)}
+.testi-stars{color:var(--gold);font-size:.95rem;margin-bottom:.8rem;letter-spacing:.05em}
+.testi-text{font-size:.88rem;color:var(--muted2);line-height:1.75;margin-bottom:1.1rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:.75rem}
+.testi-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.8rem;color:#04070F;
+}
+.testi-name{font-weight:600;font-size:.84rem}
+.testi-school{font-size:.73rem;color:var(--muted2)}
+
+/* ─── MODAL ─── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{
+  background:var(--card2);border:1px solid var(--border2);border-radius:24px;
+  width:100%;max-width:800px;max-height:90vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(30px) scale(.97);transition:transform .35s;
+  box-shadow:0 40px 120px rgba(0,0,0,.8),0 0 0 1px rgba(0,245,212,.08);
+}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
+.modal-header{
+  padding:1.3rem 1.6rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.01);
+}
+.modal-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem}
+.modal-close{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:1.5rem;line-height:1;transition:color .2s}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:1.6rem;overflow-y:auto;flex:1;font-size:.92rem;line-height:1.85}
+
+/* ─── FORMAT: AI ANSWER ─── */
+.ai-text h1,.ai-text h2,.ai-text h3{font-family:'Playfair Display',serif;margin:1.2rem 0 .6rem;color:var(--text)}
+.ai-text h1{font-size:1.4rem}.ai-text h2{font-size:1.2rem}.ai-text h3{font-size:1.05rem;color:var(--cyan)}
+.ai-text p{margin-bottom:.85rem}
+.ai-text strong{color:var(--cyan);font-weight:700}
+.ai-text em{color:var(--gold);font-style:italic}
+.ai-text ul,.ai-text ol{padding-left:1.5rem;margin-bottom:.85rem}
+.ai-text li{margin-bottom:.4rem}
+.ai-text code{font-family:'JetBrains Mono',monospace;background:rgba(0,245,212,.1);padding:.1rem .4rem;border-radius:5px;font-size:.85em;color:var(--cyan)}
+.ai-text pre{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:1rem;overflow-x:auto;margin-bottom:1rem}
+.ai-text pre code{background:none;padding:0;font-size:.87em}
+.ai-text blockquote{border-left:3px solid var(--cyan);padding-left:1rem;color:var(--muted2);margin-bottom:.85rem;font-style:italic}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:400;
+  background:rgba(0,245,212,.12);border:1px solid rgba(0,245,212,.28);
+  color:var(--text);padding:.85rem 1.25rem;border-radius:13px;
+  font-size:.88rem;transform:translateY(80px);opacity:0;
+  transition:all .35s;backdrop-filter:blur(12px);
+  max-width:300px;box-shadow:0 12px 40px rgba(0,0,0,.4);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ─── FOOTER ─── */
+footer{
+  position:relative;z-index:10;
+  border-top:1px solid var(--border);padding:3rem 2rem;
+  text-align:center;
+}
+.footer-inner{max-width:800px;margin:0 auto}
+.footer-logo{
+  font-family:'Playfair Display',serif;font-weight:900;font-size:1.6rem;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:1rem;
+}
+.footer-desc{font-size:.88rem;color:var(--muted2);line-height:1.7;max-width:480px;margin:0 auto 1.5rem}
+.footer-creator{
+  font-size:.82rem;color:var(--muted);margin-top:1.5rem;
+  border-top:1px solid var(--border);padding-top:1.5rem;
+}
+.footer-creator strong{color:var(--cyan)}
+.footer-links{display:flex;justify-content:center;gap:1.5rem;margin:1.2rem 0;flex-wrap:wrap}
+.footer-links a{color:var(--muted2);text-decoration:none;font-size:.84rem;transition:color .2s}
+.footer-links a:hover{color:var(--cyan)}
+
+/* ─── DIVIDER ─── */
+.divider{border:none;border-top:1px solid var(--border);margin:0}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,245,212,.2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,245,212,.35)}
+
+/* ─── MOBILE ─── */
+@media(max-width:640px){
+  nav{padding:0 1rem}
+  .nav-links{display:none}
+  .hero{padding:5.5rem 1rem 2rem}
+  .section{padding:3.5rem 1rem}
+  .hero h1{letter-spacing:-1px}
+}
+</style>
+</head>
+<body>
+
+<!-- 3D CANVAS (Three.js) -->
+<canvas id="three-canvas"></canvas>
+
+<!-- MESH ORBS -->
+<div class="mesh">
+  <div class="mesh-blob mb1"></div>
+  <div class="mesh-blob mb2"></div>
+  <div class="mesh-blob mb3"></div>
+  <div class="mesh-blob mb4"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    NepGenius AI
+  </div>
+  <ul class="nav-links">
+    <li><a href="#subjects">Subjects</a></li>
+    <li><a href="#notes-section">Notes</a></li>
+    <li><a href="#past-papers">Past Papers</a></li>
+    <li><a href="#qa-section">Q&amp;A</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn-nav-primary" onclick="scrollToSearch()">✨ Ask AI</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <div class="hero-badge-dot"></div>
+    AI-Powered · NEB Class 12 · Nepal
+  </div>
+  <h1>
+    The Smartest Way to<br>
+    <span class="grad-text">Study for NEB</span>
+  </h1>
+  <p class="hero-sub">
+    Ask any question from the Nepal Class 12 curriculum and get instant AI answers, comprehensive notes, image search, and past papers — all in one premium platform.
+  </p>
+
+  <!-- SEARCH MEGA -->
+  <div class="search-mega" id="search-mega">
+    <div class="search-box">
+      <div class="search-top">
+        <div class="search-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <input id="main-input" type="text"
+          placeholder="Ask any NEB question, or type 'notes physics chapter 3'..."
+          onkeydown="handleKey(event)"
+          autocomplete="off"
+          autocorrect="off">
+        <button class="voice-btn" id="voice-btn" onclick="startVoice()" title="Voice Search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+          </svg>
+        </button>
+      </div>
+      <div class="search-bottom">
+        <div class="subject-chips" id="subject-chips">
+          <span class="chip active" onclick="setChip(this,'All')">All</span>
+          <span class="chip" onclick="setChip(this,'Physics')">⚛️ Physics</span>
+          <span class="chip" onclick="setChip(this,'Chemistry')">🧪 Chemistry</span>
+          <span class="chip" onclick="setChip(this,'Mathematics')">📐 Maths</span>
+          <span class="chip" onclick="setChip(this,'Biology')">🧬 Biology</span>
+          <span class="chip" onclick="setChip(this,'English')">📖 English</span>
+          <span class="chip" onclick="setChip(this,'Nepali')">🇳🇵 Nepali</span>
+          <span class="chip" onclick="setChip(this,'Computer')">💻 Computer</span>
+          <span class="chip" onclick="setChip(this,'Accountancy')">📊 Account</span>
+        </div>
+        <div class="search-actions">
+          <button class="btn-notes" onclick="searchNotes()">📄 Get Notes</button>
+          <button class="btn-ask" onclick="askQuestion()">✨ Ask AI</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK PROMPTS -->
+  <div class="quick-prompts">
+    <div class="qprompt" onclick="quickFill('Explain Newton\'s laws of motion')">Newton's Laws</div>
+    <div class="qprompt" onclick="quickFill('Organic Chemistry reactions for NEB')">Organic Chemistry</div>
+    <div class="qprompt" onclick="quickFill('Integration formulas Class 12 Maths NEB')">Integration</div>
+    <div class="qprompt" onclick="quickFill('Photosynthesis and respiration Biology')">Photosynthesis</div>
+    <div class="qprompt" onclick="quickFill('English grammar Class 12 tenses')">English Grammar</div>
+    <div class="qprompt" onclick="quickFill('Database management notes Computer Science')">Database</div>
+  </div>
+</section>
+
+<!-- ANSWER PANEL -->
+<div id="answer-panel">
+  <div class="answer-card">
+    <div class="answer-header">
+      <div class="answer-label"><div class="answer-label-dot"></div> NepGenius AI Response</div>
+      <button class="close-btn" onclick="closeAnswer()">×</button>
+    </div>
+    <div class="answer-tabs" id="answer-tabs">
+      <div class="atab active" onclick="switchTab(this,'ai-tab')">🤖 AI Answer</div>
+      <div class="atab" onclick="switchTab(this,'web-tab')">🌐 Web Results</div>
+      <div class="atab" onclick="switchTab(this,'img-tab')">🖼️ Images</div>
+      <div class="atab" onclick="switchTab(this,'notes-tab')">📄 Notes</div>
+    </div>
+    <div id="ai-tab" class="atab-content active">
+      <div id="answer-body">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+    <div id="web-tab" class="atab-content">
+      <div class="web-results-wrap" id="web-results-list"></div>
+    </div>
+    <div id="img-tab" class="atab-content">
+      <div class="img-results-wrap" id="img-results-list"></div>
+    </div>
+    <div id="notes-tab" class="atab-content">
+      <div class="notes-results-wrap" id="notes-grid-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">50K+</div><div class="stat-label">Questions Answered</div></div>
+      <div class="stat-card"><div class="stat-num">1,200+</div><div class="stat-label">Study Notes</div></div>
+      <div class="stat-card"><div class="stat-num">15+</div><div class="stat-label">Years Past Papers</div></div>
+      <div class="stat-card"><div class="stat-num">98%</div><div class="stat-label">Student Satisfaction</div></div>
+      <div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">Subjects Covered</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SUBJECTS -->
+<section class="section" id="subjects">
+  <div class="section-inner">
+    <div class="section-label">Curriculum</div>
+    <h2 class="section-title">All NEB Subjects</h2>
+    <p class="section-sub">Click any subject to instantly access AI answers, notes, and past papers.</p>
+    <div class="subjects-grid">
+      <div class="subj-card" onclick="quickSearch('Physics Class 12 NEB Nepal comprehensive notes')">
+        <span class="subj-emoji">⚛️</span>
+        <div class="subj-name">Physics</div>
+        <div class="subj-count">18 Chapters · 340 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:92%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Chemistry Class 12 NEB Nepal comprehensive notes')">
+        <span class="subj-emoji">🧪</span>
+        <div class="subj-name">Chemistry</div>
+        <div class="subj-count">20 Chapters · 410 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:88%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Mathematics Class 12 NEB Nepal comprehensive notes')">
+        <span class="subj-emoji">📐</span>
+        <div class="subj-name">Mathematics</div>
+        <div class="subj-count">16 Chapters · 520 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:95%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Biology Class 12 NEB Nepal comprehensive notes')">
+        <span class="subj-emoji">🧬</span>
+        <div class="subj-name">Biology</div>
+        <div class="subj-count">22 Chapters · 480 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:85%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('English Class 12 NEB Nepal notes grammar')">
+        <span class="subj-emoji">📖</span>
+        <div class="subj-name">English</div>
+        <div class="subj-count">12 Units · 200 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:78%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Nepali Class 12 NEB notes व्याकरण')">
+        <span class="subj-emoji">🇳🇵</span>
+        <div class="subj-name">Nepali</div>
+        <div class="subj-count">10 Units · 180 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:80%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Computer Science Class 12 NEB Nepal notes')">
+        <span class="subj-emoji">💻</span>
+        <div class="subj-name">Computer Science</div>
+        <div class="subj-count">14 Chapters · 290 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:82%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Accountancy Class 12 NEB Nepal notes')">
+        <span class="subj-emoji">📊</span>
+        <div class="subj-name">Accountancy</div>
+        <div class="subj-count">12 Chapters · 240 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:75%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Economics Class 12 NEB Nepal notes')">
+        <span class="subj-emoji">📈</span>
+        <div class="subj-name">Economics</div>
+        <div class="subj-count">11 Chapters · 210 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:70%"></div></div>
+      </div>
+      <div class="subj-card" onclick="quickSearch('Social Studies Class 12 NEB Nepal notes')">
+        <span class="subj-emoji">🌏</span>
+        <div class="subj-name">Social Studies</div>
+        <div class="subj-count">10 Chapters · 190 Q</div>
+        <div class="subj-bar"><div class="subj-bar-fill" style="width:68%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- NOTES SECTION -->
+<section class="section" id="notes-section">
+  <div class="section-inner">
+    <div class="section-label">Study Materials</div>
+    <h2 class="section-title">Chapter Notes</h2>
+    <p class="section-sub">AI-generated comprehensive notes aligned to the NEB Class 12 syllabus.</p>
+    <div class="notes-big-grid" id="notes-big-grid"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PAST PAPERS -->
+<section class="section" id="past-papers">
+  <div class="section-inner">
+    <div class="section-label">Board Exams</div>
+    <h2 class="section-title">Past Year Papers</h2>
+    <p class="section-sub">Practice with NEB board exam questions from previous years.</p>
+    <div class="yqp-grid" id="yqp-grid"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- QUICK Q&A -->
+<section class="section" id="qa-section">
+  <div class="section-inner">
+    <div class="section-label">Quick Revision</div>
+    <h2 class="section-title">Common NEB Questions</h2>
+    <p class="section-sub">Frequently asked board exam questions with instant AI answers.</p>
+    <div class="qa-grid" id="qa-grid"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Student Reviews</div>
+    <h2 class="section-title">What Students Say</h2>
+    <div class="testi-grid" id="testi-grid"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="section-inner" style="text-align:center">
+    <div class="section-label" style="justify-content:center">About</div>
+    <h2 class="section-title">Built for Nepal Students</h2>
+    <p class="section-sub" style="margin:0 auto 2rem;max-width:600px">
+      NepGenius AI is the most advanced AI-powered study platform for Nepal Class 12 students. Every answer, note, and question is tailored specifically to the NEB syllabus. Ask it anything — it even knows who made it.
+    </p>
+    <div style="display:inline-flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:1.2rem 2rem;font-size:.9rem;color:var(--muted2)">
+      <span style="font-size:1.6rem">👨‍💻</span>
+      <div style="text-align:left">
+        <div style="font-weight:700;color:var(--text);font-size:.95rem">Nikhil Ghimire</div>
+        <div style="font-size:.8rem">Creator & Developer of NepGenius AI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">NepGenius AI</div>
+    <p class="footer-desc">The most advanced AI-powered study portal for Nepal Class 12 NEB students. Ask questions, get notes, and ace your boards.</p>
+    <div class="footer-links">
+      <a href="#subjects">Subjects</a>
+      <a href="#notes-section">Notes</a>
+      <a href="#past-papers">Past Papers</a>
+      <a href="#qa-section">Quick Q&amp;A</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="footer-creator">
+      Made with ❤️ by <strong>Nikhil Ghimire</strong> · NepGenius AI © 2025 · All rights reserved
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Notes</div>
+      <button class="modal-close" onclick="closeModalDirect()">×</button>
+    </div>
+    <div class="modal-body ai-text" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+<script>
+// ──────────────────────────────────────────────
+// THREE.JS 3D BACKGROUND
+// ──────────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('three-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  // Particles
+  const count = 1200;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  const col = new Float32Array(count * 3);
+  for(let i=0;i<count;i++){
+    pos[i*3]   = (Math.random()-0.5)*20;
+    pos[i*3+1] = (Math.random()-0.5)*20;
+    pos[i*3+2] = (Math.random()-0.5)*20;
+    const t = Math.random();
+    if(t<0.4){col[i*3]=0;col[i*3+1]=0.96;col[i*3+2]=0.83}
+    else if(t<0.7){col[i*3]=0.31;col[i*3+1]=0.76;col[i*3+2]=0.97}
+    else{col[i*3]=0.70;col[i*3+1]=0.62;col[i*3+2]=0.85}
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col,3));
+  const mat = new THREE.PointsMaterial({size:0.035,vertexColors:true,transparent:true,opacity:.6});
+  scene.add(new THREE.Points(geo,mat));
+
+  // Floating torus rings
+  const ringGeo = new THREE.TorusGeometry(2, 0.008, 8, 80);
+  const ringMat = new THREE.MeshBasicMaterial({color:0x00F5D4, transparent:true, opacity:.12, wireframe:true});
+  const ring1 = new THREE.Mesh(ringGeo, ringMat);
+  ring1.rotation.x = Math.PI/2.5; scene.add(ring1);
+  const ring2 = ring1.clone(); ring2.rotation.y = Math.PI/3;
+  ring2.scale.set(1.5,1.5,1.5); scene.add(ring2);
+  const ring3 = ring1.clone(); ring3.rotation.z = Math.PI/4;
+  ring3.scale.set(0.7,0.7,0.7); scene.add(ring3);
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e=>{
+    mouseX = (e.clientX/window.innerWidth-.5)*1.5;
+    mouseY = (e.clientY/window.innerHeight-.5)*-1.5;
+  });
+
+  let frame = 0;
+  (function animate(){
+    requestAnimationFrame(animate);
+    frame += 0.003;
+    scene.rotation.y = mouseX * 0.3 + frame * 0.05;
+    scene.rotation.x = mouseY * 0.2;
+    ring1.rotation.z += 0.002;
+    ring2.rotation.x += 0.0015;
+    ring3.rotation.y += 0.003;
+    renderer.render(scene, camera);
+  })();
+
+  window.addEventListener('resize', ()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+})();
+
+// ──────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────
+let activeSubject = 'All';
+let isListening = false;
+
+function setChip(el, subj) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeSubject = subj;
+}
+
+function scrollToSearch() {
+  document.getElementById('search-mega').scrollIntoView({behavior:'smooth', block:'center'});
+  setTimeout(() => document.getElementById('main-input').focus(), 400);
+}
+
+function quickFill(text) {
+  document.getElementById('main-input').value = text;
+  document.getElementById('search-mega').scrollIntoView({behavior:'smooth', block:'center'});
+  setTimeout(() => askQuestion(), 300);
+}
+
+function quickSearch(query) {
+  document.getElementById('main-input').value = query;
+  scrollToSearch();
+  setTimeout(() => askQuestion(), 400);
+}
+
+function handleKey(e) {
+  if(e.key === 'Enter') {
+    const q = document.getElementById('main-input').value.toLowerCase();
+    if(q.includes('note') || q.includes('notes')) {
+      searchNotes();
+    } else {
+      askQuestion();
+    }
+  }
+}
+
+// ──────────────────────────────────────────────
+// VOICE SEARCH
+// ──────────────────────────────────────────────
+function startVoice() {
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showToast('Voice search not supported in this browser.');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SR();
+  rec.lang = 'en-IN'; rec.continuous = false; rec.interimResults = false;
+  isListening = true;
+  document.getElementById('voice-btn').classList.add('listening');
+  showToast('🎙️ Listening... speak your question');
+  rec.start();
+  rec.onresult = e => {
+    const t = e.results[0][0].transcript;
+    document.getElementById('main-input').value = t;
+    isListening = false;
+    document.getElementById('voice-btn').classList.remove('listening');
+    askQuestion();
+  };
+  rec.onerror = () => {
+    isListening = false;
+    document.getElementById('voice-btn').classList.remove('listening');
+    showToast('Voice error. Try again.');
+  };
+  rec.onend = () => {
+    isListening = false;
+    document.getElementById('voice-btn').classList.remove('listening');
+  };
+}
+
+// ──────────────────────────────────────────────
+// ASK AI
+// ──────────────────────────────────────────────
+async function askQuestion() {
+  const q = document.getElementById('main-input').value.trim();
+  if(!q) { showToast('Please type a question first.'); return; }
+
+  // Check if it's asking who created
+  if(/who (created|made|built|developed) you/i.test(q) || /who (is your|your) (creator|developer|maker)/i.test(q)) {
+    showPanel();
+    document.getElementById('answer-body').innerHTML = `<div class="ai-text"><p>I was created by <strong>Nikhil Ghimire</strong> 🎓 — a talented developer who built NepGenius AI to help Nepal Class 12 NEB students study smarter, get instant answers, and access comprehensive notes all in one place.</p></div>`;
+    buildWebResults(q);
+    buildImageResults(q);
+    buildNotesResults(q);
+    return;
+  }
+
+  showPanel();
+  document.getElementById('answer-body').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+  const subjContext = activeSubject !== 'All' ? ` (Subject: ${activeSubject})` : '';
+  const systemPrompt = `You are NepGenius AI, an expert Nepal NEB Class 12 study assistant created by Nikhil Ghimire. You specialize in the Nepal NEB (National Examination Board) Class 12 curriculum. Always provide comprehensive, well-structured, exam-focused answers. Format responses with markdown: use **bold** for key terms, ## for section headers, bullet lists for steps/lists, and code blocks for programming. If asked who created you, always say "I was created by Nikhil Ghimire." Provide NEB-exam-relevant answers.`;
+
+  const userMsg = `Nepal NEB Class 12${subjContext} question: ${q}\n\nProvide a comprehensive, exam-focused answer with clear sections, key points, formulas if applicable, and NEB board exam tips.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages:[{role:'user', content:userMsg}]
+      })
+    });
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const text = data.content?.map(c=>c.text||'').join('') || 'No response received.';
+    document.getElementById('answer-body').innerHTML = `<div class="ai-text">${formatAnswer(text)}</div>`;
+  } catch(err) {
+    document.getElementById('answer-body').innerHTML = `<div style="color:var(--red);padding:.5rem">⚠️ Error: ${err.message || 'Failed to get answer. Please try again.'}</div>`;
+  }
+
+  buildWebResults(q);
+  buildImageResults(q);
+  buildNotesResults(q);
+}
+
+// ──────────────────────────────────────────────
+// NOTES SEARCH
+// ──────────────────────────────────────────────
+async function searchNotes() {
+  const q = document.getElementById('main-input').value.trim();
+  const topic = q || (activeSubject !== 'All' ? activeSubject + ' Class 12 NEB' : 'Class 12 NEB Nepal');
+
+  showPanel();
+  switchTabById('notes-tab');
+  document.getElementById('notes-grid-results').innerHTML = '<div class="loading-dots" style="padding:1.5rem"><span></span><span></span><span></span></div>';
+  document.getElementById('answer-body').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+  // Generate AI notes
+  const prompt = `You are NepGenius AI, created by Nikhil Ghimire. Generate comprehensive NEB Class 12 study notes for: "${topic}"\n\nInclude:\n## 📌 Overview\n## 📚 Key Concepts & Definitions\n## 🔢 Important Formulas / Points\n## 📝 Detailed Explanation with Examples\n## 💡 Solved Examples\n## ⚠️ Common Mistakes\n## 🎯 NEB Exam Tips\n## ❓ Expected Exam Questions\n\nMake it comprehensive and exam-focused for Nepal NEB Class 12.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user', content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c=>c.text||'').join('') || '';
+    document.getElementById('answer-body').innerHTML = `
+      <div style="background:rgba(0,245,212,.06);border:1px solid rgba(0,245,212,.18);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1.3rem;font-size:.83rem;color:var(--muted2)">
+        📄 Notes generated for: <strong style="color:var(--cyan)">${topic}</strong>
+      </div>
+      <div class="ai-text">${formatAnswer(text)}</div>`;
+    switchTabById('ai-tab');
+  } catch(e) {
+    document.getElementById('answer-body').innerHTML = `<div style="color:var(--red)">⚠️ Failed to load notes. Please try again.</div>`;
+  }
+
+  buildWebResults(topic + ' notes');
+  buildImageResults(topic + ' diagram notes');
+  buildNotesResults(topic);
+}
+
+// ──────────────────────────────────────────────
+// FORMAT AI ANSWER
+// ──────────────────────────────────────────────
+function formatAnswer(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]+?<\/li>)/g,'<ul>$1</ul>')
+    .replace(/^(\d+)\. (.+)$/gm,'<li>$2</li>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/^(?!<[h|u|o|l|b|p|c])/gm,'')
+    .replace(/(<p>)?(.+?)(<\/p>)?$/gm, m => {
+      if(m.startsWith('<')) return m;
+      return '<p>' + m + '</p>';
+    });
+}
+
+// ──────────────────────────────────────────────
+// WEB RESULTS (Simulated + realistic)
+// ──────────────────────────────────────────────
+function buildWebResults(query) {
+  const sources = [
+    {src:'hamropatro.com', title:`${query} - NEB Study Resource`, snippet:`Comprehensive study material for Nepal NEB Class 12 covering ${query}. Includes solved exercises and past paper questions.`},
+    {src:'nepalibabu.com.np', title:`Class 12 ${query} Notes PDF - NepaliSansar`, snippet:`Download free study notes, important questions and answers for ${query} based on NEB syllabus 2080.`},
+    {src:'edusanjal.com', title:`${query} | Edusanjal NEB Resources`, snippet:`Find all NEB exam resources, model questions and solutions for Class 12 ${query}. Updated for 2080 board exam.`},
+    {src:'kullabs.com', title:`${query} Complete Notes - Kullabs`, snippet:`Step-by-step explanations and NEB exam tips for ${query}. Trusted by thousands of Nepal students since 2015.`},
+    {src:'notebahadur.com', title:`${query} Notes & Solutions | NotesBahadur`, snippet:`Premium study notes for Nepal Class 12. Download ${query} notes, formulas, and solved exercises.`},
+  ];
+  document.getElementById('web-results-list').innerHTML = sources.map(s=>`
+    <a class="web-item" href="https://${s.src}" target="_blank" rel="noopener">
+      <div class="web-src"><div class="web-src-dot"></div>${s.src}</div>
+      <div class="web-title">${s.title}</div>
+      <div class="web-snippet">${s.snippet}</div>
+    </a>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// IMAGE RESULTS (Fetched via Unsplash/Pexels API simulation)
+// ──────────────────────────────────────────────
+function buildImageResults(query) {
+  const wrap = document.getElementById('img-results-list');
+  wrap.innerHTML = '<div class="loading-dots" style="padding:1.5rem"><span></span><span></span><span></span></div>';
+
+  // Use Picsum for placeholder education-related images
+  const imgs = [
+    {url:`https://source.unsplash.com/400x300/?study,${encodeURIComponent(query.split(' ')[0])}`, label: query.split(' ')[0]+' Concept'},
+    {url:`https://source.unsplash.com/400x300/?science,${encodeURIComponent(query.split(' ')[0])}`, label:'Science Diagram'},
+    {url:`https://source.unsplash.com/400x300/?education,textbook`, label:'Study Guide'},
+    {url:`https://source.unsplash.com/400x300/?formula,mathematics`, label:'Formula Sheet'},
+    {url:`https://source.unsplash.com/400x300/?laboratory,experiment`, label:'Lab Work'},
+    {url:`https://source.unsplash.com/400x300/?classroom,nepal`, label:'NEB Prep'},
+  ];
+
+  wrap.innerHTML = imgs.map(img=>`
+    <div class="img-thumb" onclick="window.open('${img.url}','_blank')">
+      <img src="${img.url}" alt="${img.label}" loading="lazy" onerror="this.src='https://picsum.photos/400/300?random=${Math.floor(Math.random()*1000)}'">
+      <div class="img-thumb-label">${img.label}</div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// NOTES RESULTS IN PANEL
+// ──────────────────────────────────────────────
+function buildNotesResults(query) {
+  const matches = notesData.filter(n =>
+    n.title.toLowerCase().includes(query.toLowerCase()) ||
+    n.subject.toLowerCase().includes(query.toLowerCase()) ||
+    n.chapter.toLowerCase().includes(query.toLowerCase())
+  ).slice(0,8);
+
+  const show = matches.length > 0 ? matches : notesData.slice(0,8);
+  document.getElementById('notes-grid-results').innerHTML = show.map((n,i)=>`
+    <div class="note-mini" onclick="openNoteModal(${notesData.indexOf(n)})">
+      <div class="note-mini-icon">${n.emoji}</div>
+      <div class="note-mini-title">${n.title}</div>
+      <div class="note-mini-meta">${n.subject} · ${n.chapter}</div>
+      <div class="note-mini-badge">${n.pages}</div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// PANEL + TAB HELPERS
+// ──────────────────────────────────────────────
+function showPanel() {
+  const p = document.getElementById('answer-panel');
+  p.style.display = 'block';
+  setTimeout(() => p.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+  switchTabById('ai-tab');
+}
+
+function closeAnswer() {
+  document.getElementById('answer-panel').style.display = 'none';
+}
+
+function switchTab(el, tabId) {
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.atab-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+function switchTabById(tabId) {
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.atab-content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.atab').forEach(t=>{
+    if(t.getAttribute('onclick')?.includes(tabId)) t.classList.add('active');
+  });
+  const el = document.getElementById(tabId);
+  if(el) el.classList.add('active');
+}
+
+// ──────────────────────────────────────────────
+// NOTES DATA
+// ──────────────────────────────────────────────
+const notesData = [
+  {emoji:'⚡',title:"Newton's Laws of Motion",subject:"Physics",chapter:"Chapter 3",desc:"Force, mass, acceleration and Newton's three laws explained for NEB.",pages:"~18 pages"},
+  {emoji:'🌊',title:"Waves & Sound",subject:"Physics",chapter:"Chapter 8",desc:"Mechanical waves, sound properties, Doppler effect and resonance.",pages:"~16 pages"},
+  {emoji:'💡',title:"Electromagnetic Induction",subject:"Physics",chapter:"Chapter 14",desc:"Faraday's law, Lenz's law, transformers and generators.",pages:"~20 pages"},
+  {emoji:'🔭',title:"Modern Physics",subject:"Physics",chapter:"Chapter 18",desc:"Photoelectric effect, Bohr's model, nuclear reactions and X-rays.",pages:"~22 pages"},
+  {emoji:'🧪',title:"Organic Chemistry",subject:"Chemistry",chapter:"Chapter 9",desc:"Hydrocarbons, functional groups, reactions and mechanisms.",pages:"~24 pages"},
+  {emoji:'⚗️',title:"Electrochemistry",subject:"Chemistry",chapter:"Chapter 12",desc:"Electrolysis, Faraday's laws, galvanic cells and electrode potential.",pages:"~18 pages"},
+  {emoji:'🔬',title:"Coordination Chemistry",subject:"Chemistry",chapter:"Chapter 17",desc:"IUPAC nomenclature, isomerism and bonding in complexes.",pages:"~14 pages"},
+  {emoji:'📐',title:"Integration",subject:"Mathematics",chapter:"Chapter 7",desc:"Indefinite and definite integrals, properties and applications.",pages:"~26 pages"},
+  {emoji:'📊',title:"Matrices & Determinants",subject:"Mathematics",chapter:"Chapter 3",desc:"Operations, inverses, Cramer's rule and eigenvalues.",pages:"~20 pages"},
+  {emoji:'∞',title:"Limits & Continuity",subject:"Mathematics",chapter:"Chapter 4",desc:"L'Hôpital's rule, continuity theorems and differentiability.",pages:"~18 pages"},
+  {emoji:'🧬',title:"Genetics & Heredity",subject:"Biology",chapter:"Chapter 15",desc:"Mendel's laws, chromosomal inheritance, DNA and mutations.",pages:"~22 pages"},
+  {emoji:'🌿',title:"Plant Physiology",subject:"Biology",chapter:"Chapter 8",desc:"Photosynthesis, respiration, transpiration and growth hormones.",pages:"~20 pages"},
+  {emoji:'🫀',title:"Human Physiology",subject:"Biology",chapter:"Chapter 12",desc:"Circulatory, respiratory, digestive and nervous systems.",pages:"~28 pages"},
+  {emoji:'💻',title:"Database Management",subject:"Computer",chapter:"Chapter 5",desc:"DBMS concepts, SQL queries, normalization and ER diagrams.",pages:"~20 pages"},
+  {emoji:'🌐',title:"Computer Networks",subject:"Computer",chapter:"Chapter 7",desc:"OSI model, TCP/IP, protocols and network topologies.",pages:"~18 pages"},
+  {emoji:'📖',title:"English Grammar",subject:"English",chapter:"All Units",desc:"Tenses, voice, narration, conditionals and transformation.",pages:"~22 pages"},
+  {emoji:'📚',title:"Financial Accounting",subject:"Accountancy",chapter:"Chapter 4",desc:"Journal, ledger, trial balance, final accounts and depreciation.",pages:"~24 pages"},
+  {emoji:'📈',title:"Macroeconomics",subject:"Economics",chapter:"Chapter 6",desc:"National income, inflation, fiscal policy and monetary policy.",pages:"~20 pages"},
+];
+
+function buildNotes() {
+  document.getElementById('notes-big-grid').innerHTML = notesData.slice(0,9).map((n,i)=>`
+    <div class="nbc" onclick="openNoteModal(${i})">
+      <div class="nbc-top">
+        <div class="nbc-emoji">${n.emoji}</div>
+        <div class="nbc-tag">${n.subject}</div>
+      </div>
+      <div class="nbc-title">${n.title}</div>
+      <div class="nbc-desc">${n.desc}</div>
+      <div class="nbc-footer">
+        <div class="nbc-pages">${n.pages}</div>
+        <button class="btn-view">View Notes →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openNoteModal(i) {
+  const n = notesData[i];
+  document.getElementById('modal-title').textContent = n.emoji + ' ' + n.title;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-body').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+  const prompt = `You are NepGenius AI, created by Nikhil Ghimire. Write complete, comprehensive NEB Class 12 study notes for:
+
+Topic: ${n.title}
+Subject: ${n.subject}
+Chapter: ${n.chapter}
+Description: ${n.desc}
+
+Provide full chapter notes:
+## 📌 Overview & Introduction
+## 📚 Key Definitions & Concepts
+## 🔢 Important Formulas (if applicable)
+## 📝 Detailed Explanations with Examples
+## 💡 Solved Examples
+## ⚠️ Common Mistakes to Avoid
+## 🎯 NEB Exam Important Points
+## ❓ Likely NEB Exam Questions
+
+Make it comprehensive and aligned to Nepal NEB Class 12 syllabus.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user', content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c=>c.text||'').join('') || '';
+    document.getElementById('modal-body').innerHTML = `
+      <div style="background:rgba(0,245,212,.06);border:1px solid rgba(0,245,212,.18);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1.4rem">
+        <div style="display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted2)">
+          <span>📚 ${n.subject}</span><span>📖 ${n.chapter}</span><span>📄 ${n.pages}</span>
+        </div>
+      </div>
+      <div class="ai-text" style="font-size:.91rem">${formatAnswer(text)}</div>`;
+  } catch(e) {
+    document.getElementById('modal-body').innerHTML = '<p style="color:var(--red)">⚠️ Error loading notes. Please try again.</p>';
+  }
+}
+
+// ──────────────────────────────────────────────
+// PAST PAPERS
+// ──────────────────────────────────────────────
+const years = [
+  {year:'2080',label:'Latest',subjects:['Physics','Chemistry','Maths','Biology','English','Nepali','Computer','Account','Economics']},
+  {year:'2079',label:'',subjects:['Physics','Chemistry','Maths','Biology','English','Nepali','Computer']},
+  {year:'2078',label:'',subjects:['Physics','Chemistry','Maths','Biology','English','Nepali']},
+  {year:'2077',label:'COVID Year',subjects:['Physics','Chemistry','Maths','Biology','English']},
+  {year:'2076',label:'',subjects:['Physics','Chemistry','Maths','Biology','English','Nepali','Computer','Account']},
+  {year:'2075',label:'',subjects:['Physics','Chemistry','Maths','Biology','English','Nepali']},
+  {year:'2074',label:'',subjects:['Physics','Chemistry','Maths','Biology','English']},
+  {year:'2073',label:'',subjects:['Physics','Chemistry','Maths','Biology']},
+];
+
+function buildYQP() {
+  document.getElementById('yqp-grid').innerHTML = years.map(y=>`
+    <div class="yqp-card" onclick="openYearPaper('${y.year}')">
+      <div class="yqp-lbl">${y.label || 'NEB Board Exam'}</div>
+      <div class="yqp-year">${y.year}</div>
+      <div class="yqp-tags">${y.subjects.map(s=>`<span class="yqp-tag">${s}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+async function openYearPaper(year) {
+  document.getElementById('modal-title').textContent = `📋 NEB ${year} Past Paper Questions`;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-body').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+  const prompt = `Generate realistic Nepal NEB Class 12 board exam questions as if from the ${year} NEB exam.
+
+Create important questions for Physics, Chemistry, Maths, Biology (5-6 each):
+
+**Physics (${year})**
+1. [Long answer, 8 marks]
+...
+
+**Chemistry (${year})**
+...
+
+Include mark allocation. Make them realistic NEB-style questions covering key topics. Add model answer hints.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c=>c.text||'').join('') || '';
+    document.getElementById('modal-body').innerHTML = `
+      <div style="background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1.4rem;font-size:.82rem;color:var(--muted2)">
+        ⚠️ AI-generated representative NEB ${year} questions for practice purposes only.
+      </div>
+      <div class="ai-text">${formatAnswer(text)}</div>`;
+  } catch(e) {
+    document.getElementById('modal-body').innerHTML = '<p style="color:var(--red)">⚠️ Error loading past papers.</p>';
+  }
+}
+
+// ──────────────────────────────────────────────
+// QUICK Q&A
+// ──────────────────────────────────────────────
+const qaData = [
+  {q:"What is Newton's Second Law of Motion?", subj:"Physics", a:""},
+  {q:"Explain the process of Photosynthesis with diagram.", subj:"Biology", a:""},
+  {q:"What is the difference between acid and base? Give examples.", subj:"Chemistry", a:""},
+  {q:"How do you find the derivative of sin(x) and cos(x)?", subj:"Maths", a:""},
+  {q:"What are the main themes in 'The Selfish Giant' by Oscar Wilde?", subj:"English", a:""},
+  {q:"Explain the concept of Artificial Intelligence in Computer Science.", subj:"Computer", a:""},
+  {q:"What is the law of supply and demand in Economics?", subj:"Economics", a:""},
+  {q:"What is double entry bookkeeping in Accountancy?", subj:"Accountancy", a:""},
+];
+
+function buildQA() {
+  document.getElementById('qa-grid').innerHTML = qaData.map((item,i)=>`
+    <div class="qa-item" id="qa-${i}">
+      <div class="qa-q" onclick="toggleQA(${i})">
+        <span>${item.q}</span>
+        <div style="display:flex;align-items:center;gap:.6rem;flex-shrink:0">
+          <span class="qa-subj">${item.subj}</span>
+          <svg class="qa-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+      <div class="qa-a" id="qa-a-${i}">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function toggleQA(i) {
+  const item = document.getElementById(`qa-${i}`);
+  const ans = document.getElementById(`qa-a-${i}`);
+  const isOpen = item.classList.contains('open');
+
+  document.querySelectorAll('.qa-item').forEach(el=>el.classList.remove('open'));
+
+  if(!isOpen) {
+    item.classList.add('open');
+    if(!qaData[i].a) {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            model:'claude-sonnet-4-20250514',
+            max_tokens:1000,
+            messages:[{role:'user', content:`Answer this Nepal NEB Class 12 ${qaData[i].subj} question concisely (2-3 paragraphs max, with key points): ${qaData[i].q}`}]
+          })
+        });
+        const data = await res.json();
+        const text = data.content?.map(c=>c.text||'').join('') || '';
+        qaData[i].a = text;
+        ans.innerHTML = `<div class="ai-text">${formatAnswer(text)}</div>`;
+      } catch(e) {
+        ans.innerHTML = '<p style="color:var(--red)">Failed to load answer.</p>';
+      }
+    } else {
+      ans.innerHTML = `<div class="ai-text">${formatAnswer(qaData[i].a)}</div>`;
+    }
+  }
+}
+
+// ──────────────────────────────────────────────
+// TESTIMONIALS
+// ──────────────────────────────────────────────
+const testimonials = [
+  {stars:5,text:"NepGenius AI helped me score 92% in Physics! The instant answers and chapter notes are incredible. Way better than searching YouTube for hours.",name:"Aarav Sharma",school:"Budhanilkantha School, Kathmandu",initials:"AS"},
+  {stars:5,text:"I used to struggle with Organic Chemistry. This portal explains every reaction step by step. The NEB-focused answers are exactly what we need.",name:"Priya Thapa",school:"DAV College, Lalitpur",initials:"PT"},
+  {stars:5,text:"The past paper section is gold! I practiced 5 years of questions and felt so confident in the board exam. Highly recommend!",name:"Bikash Gurung",school:"Kathmandu Model College",initials:"BG"},
+  {stars:5,text:"Voice search is a game changer. I can just speak my doubt and get an answer instantly. This is the future of studying in Nepal!",name:"Sita Rai",school:"St. Xavier's College, Kathmandu",initials:"SR"},
+  {stars:4,text:"Mathematics integration notes saved my life before boards. All formulas in one place with solved examples. Perfect for last-minute revision.",name:"Rohan KC",school:"Tri-Chandra College, Kathmandu",initials:"RK"},
+  {stars:5,text:"Finally a study platform made for Nepal students! The questions are based on our NEB syllabus, not Indian or other curricula. Love it!",name:"Anisha Poudel",school:"Pinnacle College, Bhaktapur",initials:"AP"},
+];
+
+function buildTestimonials() {
+  document.getElementById('testi-grid').innerHTML = testimonials.map(t=>`
+    <div class="testi-card">
+      <div class="testi-stars">${'★'.repeat(t.stars)}${'☆'.repeat(5-t.stars)}</div>
+      <div class="testi-text">"${t.text}"</div>
+      <div class="testi-author">
+        <div class="testi-av">${t.initials}</div>
+        <div>
+          <div class="testi-name">${t.name}</div>
+          <div class="testi-school">${t.school}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// MODAL
+// ──────────────────────────────────────────────
+function closeModal(e) {
+  if(e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ──────────────────────────────────────────────
+// KEYBOARD SHORTCUTS
+// ──────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.key==='k') { e.preventDefault(); scrollToSearch(); }
+  if(e.key==='Escape') closeModalDirect();
+  if(e.key==='/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); scrollToSearch(); }
+});
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+buildNotes();
+buildYQP();
+buildQA();
+buildTestimonials();
+
+// Animate stat bars on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      entry.target.querySelectorAll('.subj-bar-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => bar.style.width = w, 100);
+      });
+    }
+  });
+}, {threshold:0.3});
+
+document.querySelectorAll('.subjects-grid').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
